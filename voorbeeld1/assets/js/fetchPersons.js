@@ -9,6 +9,8 @@ function loaded() {
     buttonPost.addEventListener("click", handlePostPerson);
     let buttonGetName = document.getElementById("button_get_name");
     buttonGetName.addEventListener("click", handleGetName);
+    let buttonPutPerson = document.getElementById("button_put_person");
+    buttonPutPerson.addEventListener("click", handlePutPerson);
 }
 
 
@@ -66,7 +68,7 @@ function handleGetPerson() {
 
 function handleGetName() {
     let url = 'http://localhost:3000/persons/';
-    let name = document.getElementById("name").value;
+    let name = document.getElementById("txt_name").value;
     let output = document.getElementById("div_output");
     makeElementEmpty(output);
     fetch(url + "?name=" + name)
@@ -124,6 +126,43 @@ function handlePostPerson() {
         .catch((error) => {
             output.appendChild(document.createTextNode(error));
         });
+}
+
+function handlePutPerson() {
+    let url = 'http://localhost:3000/persons/';
+    let output = document.getElementById("div_output");
+    let name = document.getElementById("txt_name").value;
+    let id = document.getElementById("txt_id").value;
+    let person = {name: name};
+    makeElementEmpty(output);
+    console.log(url + id);
+    fetch(url + id,
+        {
+            method: "PUT",
+            body: JSON.stringify(person),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            } else {
+                throw `error with status ${response.status}`;
+            }
+        })
+        .then((person) => {
+            let data = [];
+            data.push([person.id, person.name]);
+            let table = makeTable(data);
+            output.appendChild(table);
+        })
+        .catch((error) => {
+            output.appendChild(document.createTextNode(error));
+        });
+
+
 }
 
 
