@@ -5,7 +5,7 @@ function handleLoad() {
     let select = document.createElement("select");
     select.setAttribute("id", "select_person");
     let divoutput = document.getElementById("selectoutput");
-    selectoutput.appendChild(select);
+    divoutput.appendChild(select);
 
     let url = 'http://localhost:3000/persons/';
 
@@ -18,13 +18,11 @@ function handleLoad() {
             }
         })
         .then((persons) => {
-            let count = 1;
             for (let person of persons) {
                 let option = document.createElement("option");
                 select.appendChild(option);
-                option.setAttribute("value", `${count}`);
-                option.innerHTML = person.name;
-                count++;
+                option.setAttribute("value", `${person.id}`);
+                option.appendChild(document.createTextNode(person.name));
             }
         })
         .catch((error) => {
@@ -41,12 +39,13 @@ function handleLoad() {
 function handleGetFriends() {
     let selectionValue = document.getElementById("select_person");
     let name = selectionValue[selectionValue.selectedIndex].text;
-    console.log("Controle log/ naam: " + name); // kan zowel name als id gebruiken voor de eerste fetch te doen
+    let id = selectionValue.selectedIndex + 1;
+    console.log("Controle log/ id: " + id); // kan zowel name als id gebruiken voor de eerste fetch te doen
 
     let url = 'http://localhost:3000/persons/';
     let output = document.getElementById("output");
     makeElementEmpty(output);
-    fetch(url + "?name=" + name)
+    fetch(url + `?id=${id}`)
         .then((response) => {
             if (response.ok) {
                 return response.json();
@@ -58,10 +57,12 @@ function handleGetFriends() {
             let person = data[0];
             let friends = person.friends;
             console.log("Controle log/ friends id: " + friends);
-            let search = "";
+
+            let search = ["?"];
             for (let friend of friends) {
-                search += "?id=" + friend;
+                search.push("id=" + friend); // eerst een array maken dan .join(&) gebruiken om van array naar string te gaan
             }
+            search = search.join("&");
             console.log("Controle log/ searchstring: " + search);
             return fetch(url + search);
         })
@@ -74,9 +75,14 @@ function handleGetFriends() {
         })
         .then((friends) => {
             let outputFriends = "";
+            console.log("Controle log/ aantal vrienden: " + friends.length);
 
-            for (let person of friends) {
-                outputFriends += `${name} heeft vriend(en) ${person.name}`;
+            for (let friend = 0; friend < friends.length; friend++) {
+                if (friend === 0) {
+                    outputFriends += `${name} heeft vriend(en) ${friends[friend].name}`;
+                } else {
+                    outputFriends += `, ${friends[friend].name}`;
+                }
             }
             output.appendChild(document.createTextNode(outputFriends));
         })
@@ -106,6 +112,9 @@ function handlePostPerson() {
             } else {
                 throw `error: ${response.status}`;
             }
+        })
+        .then((data) => {
+            output.appendChild(document.createTextNode(`${data.id} ${data.name}`));
         })
 
         .catch((error) => {
