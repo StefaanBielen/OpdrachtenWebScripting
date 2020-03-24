@@ -64,4 +64,7 @@ function handleGetShips() {
                 }
             }
         })
+        .catch((error) => {
+            output.appendChild(document.createTextNode(error))
+        })
 }
