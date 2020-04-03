@@ -1,0 +1,20 @@
+body {
+    width: 1200px;
+}
+#left {
+    height: 100px;
+    width: 30%;
+    float: left;
+    display:inline-block;
+}
+#right {
+    height: 100px;
+    width: 65%;
+    border: 1px solid black;
+    float: right;
+    display:inline-block;
+
+}
+#right h1 {
+    text-align: center;
+}
